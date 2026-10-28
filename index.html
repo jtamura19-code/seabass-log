@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101719">
+  <title>シーバス釣行記録</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell home-active">
+    <!-- ホームへのリンクと保存状態を表示します。 -->
+    <header class="topbar">
+      <span class="offline-label"><span></span>端末に保存</span>
+    </header>
+
+    <main>
+      <!-- トップ画面。画像の下から各機能へ移動できます。 -->
+      <section class="view home-view active" id="home-view" aria-labelledby="home-title">
+        <figure class="cover-image">
+          <img src="Designer.png" alt="月夜の橋の下でシーバスが跳ねる、シーバスメモのトップ画像">
+          <nav class="home-menu" aria-label="釣行記録メニュー">
+            <button class="home-menu-item" type="button" data-view="record">
+              <span class="home-menu-icon" aria-hidden="true">＋</span>
+              <span class="home-menu-copy"><strong>釣果を記録</strong><small>釣行開始・状況・釣果を入力</small></span>
+              <span class="home-menu-arrow" aria-hidden="true">›</span>
+            </button>
+            <button class="home-menu-item" type="button" data-view="history">
+              <span class="home-menu-icon" aria-hidden="true">▤</span>
+              <span class="home-menu-copy"><strong>釣行履歴</strong><small>これまでの記録を確認</small></span>
+              <span class="home-menu-arrow" aria-hidden="true">›</span>
+            </button>
+            <button class="home-menu-item" type="button" data-view="lures">
+              <span class="home-menu-icon" aria-hidden="true">⌁</span>
+              <span class="home-menu-copy"><strong>ルアー管理</strong><small>使うルアーを登録・整理</small></span>
+              <span class="home-menu-arrow" aria-hidden="true">›</span>
+            </button>
+          </nav>
+        </figure>
+      </section>
+
+      <!-- 釣行の開始と、釣果を入力する画面です。 -->
+      <section class="view" id="record-view" aria-labelledby="page-title" hidden>
+        <div class="page-heading">
+          <div>
+            <p class="eyebrow">FIELD JOURNAL <span>01</span></p>
+            <h1 id="page-title">今夜の釣行</h1>
+          </div>
+          <div class="heading-date" id="today-label"></div>
+        </div>
+
+        <section class="session-panel" aria-label="釣行の状態">
+          <div class="session-copy">
+            <span class="live-dot" id="session-dot"></span>
+            <div>
+              <p class="session-label" id="session-status">釣行はまだ始まっていません</p>
+              <p class="session-detail" id="session-detail">準備ができたら記録を開始</p>
+            </div>
+          </div>
+          <button class="button button-session" id="session-toggle" type="button">釣行開始</button>
+        </section>
+
+        <div class="section-heading form-heading">
+          <div>
+            <p class="eyebrow">CATCH LOG</p>
+            <h2>釣果を記録</h2>
+          </div>
+          <span class="required-note"><i></i> 必須項目</span>
+        </div>
+
+        <form id="catch-form">
+          <section class="form-section trip-tide-section">
+            <div class="section-title"><span class="section-index">TRIP</span><h3>釣行時の潮位</h3></div>
+            <div class="field-grid">
+              <label class="field">開始時潮位 <span>cm</span>
+                <input name="tripStartTideLevel" type="number" step="any" inputmode="decimal" placeholder="開始時の潮位">
+              </label>
+              <label class="field">終了時潮位 <span>cm</span>
+                <input name="tripEndTideLevel" type="number" step="any" inputmode="decimal" placeholder="終了時の潮位">
+              </label>
+            </div>
+          </section>
+          <section class="form-section">
+            <div class="section-title"><span class="section-index">01</span><h3>場所と状況</h3></div>
+            <div class="field-grid">
+              <label class="field field-wide">釣行日時 <b>*</b>
+                <input name="date" type="datetime-local" required>
+              </label>
+              <label class="field field-wide">ポイント名 <b>*</b>
+                <input name="point" type="text" placeholder="例：○○河口・橋脚明暗" required maxlength="80">
+              </label>
+              <label class="field">緯度
+                <input name="latitude" type="number" step="any" inputmode="decimal" placeholder="35.000000">
+              </label>
+              <label class="field">経度
+                <input name="longitude" type="number" step="any" inputmode="decimal" placeholder="139.000000">
+              </label>
+              <div class="field-wide location-tools">
+                <div class="location-buttons">
+                  <button class="button button-location" id="location-button" type="button"><span aria-hidden="true">◎</span> GPSで現在地を取得</button>
+                  <button class="button button-location" id="conditions-button" type="button"><span aria-hidden="true">↻</span> 気象・潮汐を取得</button>
+                </div>
+                <p class="location-status" id="location-status" aria-live="polite">位置情報の許可が必要です。周辺地名の検索では現在地をOpenStreetMapに送信します。</p>
+                <p class="location-status" id="conditions-status" aria-live="polite">気象は<a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Open-Meteo</a>の予測、潮位は気象庁の最寄り観測所の値です。潮回りは月齢からの目安です。</p>
+              </div>
+              <label class="field">気温 <span>℃</span>
+                <input name="airTemp" type="number" step="any" inputmode="decimal" placeholder="18">
+              </label>
+              <label class="field">水温 <span>℃</span>
+                <input name="waterTemp" type="number" step="any" inputmode="decimal" placeholder="20">
+              </label>
+              <label class="field">風向
+                <select name="windDirection">
+                  <option value="">選択してください</option><option>北</option><option>北東</option><option>東</option><option>南東</option><option>南</option><option>南西</option><option>西</option><option>北西</option><option>無風</option>
+                </select>
+              </label>
+              <label class="field">風速 <span>m/s</span>
+                <input name="windSpeed" type="number" min="0" step="any" inputmode="decimal" placeholder="2">
+              </label>
+              <label class="field">気圧 <span>hPa</span>
+                <input name="pressure" type="number" step="any" inputmode="decimal" placeholder="1013">
+              </label>
+              <label class="field">潮回り
+                <select name="tideCycle">
+                  <option value="">選択してください</option><option>大潮</option><option>中潮</option><option>小潮</option><option>長潮</option><option>若潮</option>
+                </select>
+              </label>
+              <label class="field">潮位 <span>cm</span>
+                <input name="tideLevel" type="number" step="any" inputmode="decimal" placeholder="120">
+              </label>
+              <fieldset class="field field-wide tide-field">
+                <legend>潮の動き</legend>
+                <div class="segmented-control">
+                  <label><input type="radio" name="tideFlow" value="上げ潮"><span>上げ潮</span></label>
+                  <label><input type="radio" name="tideFlow" value="下げ潮"><span>下げ潮</span></label>
+                  <label><input type="radio" name="tideFlow" value="止まり"><span>止まり</span></label>
+                </div>
+              </fieldset>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <div class="section-title"><span class="section-index">02</span><h3>ルアーとベイト</h3></div>
+            <div class="field-grid">
+              <div class="field-wide catch-lures">
+                <span class="catch-lures-title">使用ルアー</span>
+                <div class="catch-lure-list" id="catch-lure-list"></div>
+                <datalist id="lure-options"></datalist>
+                <button class="button button-location add-catch-lure" id="add-catch-lure" type="button">＋ ルアーを追加</button>
+              </div>
+              <label class="field">ベイト
+                <input name="bait" type="text" placeholder="例：ハク・バチ" maxlength="80">
+              </label>
+            </div>
+          </section>
+
+          <section class="form-section">
+            <div class="section-title"><span class="section-index">03</span><h3>結果とメモ</h3></div>
+            <div class="field-grid">
+              <label class="field">バイト数
+                <input name="bites" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
+              </label>
+              <label class="field">釣果 <span>匹</span>
+                <input name="catchCount" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
+              </label>
+              <label class="field field-wide">シーバスのサイズ <span>cm</span>
+                <input name="size" type="number" min="0" step="any" inputmode="decimal" placeholder="最大サイズ">
+              </label>
+              <label class="field field-wide photo-field">写真
+                <input name="photo" type="file" accept="image/*" capture="environment">
+                <span class="photo-hint">撮影または写真を選択</span>
+                <img class="photo-preview" id="photo-preview" alt="選択した写真のプレビュー" hidden>
+              </label>
+              <label class="field field-wide">メモ
+                <textarea name="memo" rows="4" placeholder="ヒットした状況、ルアーの動かし方など" maxlength="2000"></textarea>
+              </label>
+            </div>
+          </section>
+          <div class="catch-form-actions">
+            <button class="button button-primary submit-button" type="submit"><span aria-hidden="true">＋</span> 釣果を保存</button>
+            <button class="button button-session cancel-edit-button" id="cancel-edit-button" type="button" hidden>編集をキャンセル</button>
+          </div>
+          <p class="privacy-note">入力した記録はこの端末のブラウザ内に保存されます。</p>
+        </form>
+      </section>
+
+  <!-- 保存した釣果の確認とCSV出力を行います。 -->
+      <section class="view" id="history-view" aria-labelledby="history-title" hidden>
+        <div class="page-heading">
+          <div><p class="eyebrow">YOUR RECORDS <span>02</span></p><h1 id="history-title">釣行履歴</h1></div>
+          <button class="button button-export" id="export-button" type="button" title="CSVを書き出す">↓ <span>CSV出力</span></button>
+        </div>
+        <div class="history-summary" id="history-summary"></div>
+        <h2 class="history-section-title">釣果記録</h2>
+        <div class="history-list" id="history-list"></div>
+      </section>
+
+  <!-- よく使うルアーを候補として登録・削除します。 -->
+      <section class="view" id="lures-view" aria-labelledby="lures-title" hidden>
+        <div class="page-heading">
+          <div><p class="eyebrow">TACKLE BOX <span>03</span></p><h1 id="lures-title">ルアー管理</h1></div>
+        </div>
+        <p class="view-intro">よく使うルアーを登録すると、釣果記録で候補から選べます。</p>
+        <form class="lure-form" id="lure-form">
+          <label class="field lure-name-field">ルアー名 <b>*</b>
+            <input name="lureName" type="text" placeholder="例：ミノー 120F" maxlength="80" required>
+          </label>
+          <label class="field">メーカー
+            <input name="manufacturer" type="text" list="manufacturer-options" placeholder="メーカー名を入力" maxlength="80">
+          </label>
+          <datalist id="manufacturer-options">
+            <option value="BlueBlue（ブルーブルー）"></option>
+            <option value="ima（アイマ）"></option>
+            <option value="COREMAN（コアマン）"></option>
+            <option value="LONGIN（ロンジン）"></option>
+            <option value="DUO（デュオ）"></option>
+            <option value="DAIWA（ダイワ）"></option>
+            <option value="TACKLE HOUSE（タックルハウス）"></option>
+            <option value="エバーグリーン"></option>
+            <option value="ジャンプライズ"></option>
+            <option value="シマノ"></option>
+            <option value="パズデザイン"></option>
+            <option value="BASSDAY（バスデイ）"></option>
+            <option value="ポジドライブガレージ"></option>
+            <option value="APIA（アピア）"></option>
+            <option value="ヒフミクリエイティング"></option>
+            <option value="メガバス"></option>
+            <option value="ZIPBAITS（ジップベイツ）"></option>
+            <option value="POP SEA CREW（ポップシークルー）"></option>
+            <option value="マドネス"></option>
+            <option value="ノースクラフト"></option>
+            <option value="Pick up（ピックアップ）"></option>
+            <option value="邪道"></option>
+            <option value="スミス（SMITH）"></option>
+          </datalist>
+          <label class="field">種類
+            <select name="type" required>
+              <option value="">選択してください</option>
+              <option>ミノー</option><option>シンペン</option><option>トップ</option>
+              <option>バイブ</option><option>ワーム</option><option>その他</option>
+            </select>
+          </label>
+          <label class="field">アクション
+            <select name="action" required>
+              <option value="">選択してください</option>
+              <option>ロール</option><option>ウォブンロール(ウォブリング大)</option>
+              <option>ウォブンロール(ロール大)</option><option>ウォブリング</option>
+              <option>スラローム</option><option>その他</option>
+            </select>
+          </label>
+          <label class="field">重さ <span>g</span>
+            <input name="weight" type="number" min="0" step="any" inputmode="decimal" placeholder="例：18">
+          </label>
+          <label class="field">カラー
+            <input name="color" type="text" placeholder="例：チャートバック" maxlength="80">
+          </label>
+          <label class="field">レンジ（浅） <span>cm</span>
+            <input name="shallowRange" type="number" min="0" step="any" inputmode="decimal" placeholder="潜行レンジの浅い側">
+          </label>
+          <label class="field">レンジ（深） <span>cm</span>
+            <input name="deepRange" type="number" min="0" step="any" inputmode="decimal" placeholder="潜行レンジの深い側">
+          </label>
+          <button class="button button-primary lure-submit" type="submit">＋ ルアーを追加</button>
+        </form>
+        <div class="lure-list" id="lure-list"></div>
+      </section>
+    </main>
+
+    <!-- 画面下のボタンで、ホームと各メニューを切り替えます。 -->
+    <nav class="bottom-nav" aria-label="メインメニュー">
+      <button class="nav-item active" type="button" data-view="home" aria-current="page"><span class="nav-icon" aria-hidden="true">⌂</span><span>ホーム</span></button>
+      <button class="nav-item" type="button" data-view="record"><span class="nav-icon" aria-hidden="true">＋</span><span>記録</span></button>
+      <button class="nav-item" type="button" data-view="history"><span class="nav-icon" aria-hidden="true">▤</span><span>履歴</span></button>
+      <button class="nav-item" type="button" data-view="lures"><span class="nav-icon" aria-hidden="true">⌁</span><span>ルアー</span></button>
+    </nav>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </div>
+</body>
+</html>
